@@ -1,0 +1,26 @@
+name: RSS
+on:
+  schedule:
+    - cron: "0 17 * * *"
+  push:
+
+jobs:
+  generate_rss:
+    runs-on: macOS-latest
+    name: Generate RSS
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: RSS
+        id: rss
+        uses: katydecorah/instagram-rss-action@v0.3.0
+        with:
+          yourInstagram: itsjustatest23
+          listOfInstagrams: sebastien_kardinal,no_diet_club,leserialpatissteur,foodgasm_travel,leguideultime
+      - name: Commit files
+        if: ${{ success() && steps.rss.outputs.RSS_STATUS == 'success' }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Updated instagram.json"
+          git push
